@@ -22,6 +22,9 @@
 #define LED_4          24
 #define LED_STOP       24
 
+//Wedy vibrator is add to test the power consumption
+#define Vibrator			 2
+
 #define LEDS_LIST { LED_1, LED_2, LED_3, LED_4 }
 
 #define BSP_LED_0      LED_1

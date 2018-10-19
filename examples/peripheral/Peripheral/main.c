@@ -55,6 +55,10 @@ static void GPIO_Init(void)    //LED control
 {
  nrf_gpio_cfg_output(LED_2);   //set LED_2	
  nrf_gpio_pin_clear(LED_2);
+	
+ //simulate for vibrator power consumption
+ nrf_gpio_cfg_output(Vibrator);   //set vibrator	
+ nrf_gpio_pin_clear(Vibrator);
 }
 
 
@@ -93,6 +97,8 @@ int main(void)
     LEDS_CONFIGURE(LEDS_MASK);
     LEDS_OFF(LEDS_MASK);
     uint32_t err_code;
+	
+	
     const app_uart_comm_params_t comm_params =
       {
           RX_PIN_NUMBER,
@@ -114,21 +120,34 @@ int main(void)
 
     APP_ERROR_CHECK(err_code);
 
-    while (true)
-    {
-			float result;   //the type of the data     
-		  ADC_Start();    //ÆôStart to ADC
-      while(! NRF_ADC->EVENTS_END){};  
-			result = (NRF_ADC->RESULT)*1.0;  //ADC= (Vin/3)*1024/1.2
-			result=result*1.2/1024.0;         //V'= ADC*1.2/1024
-			result *=3;												//Vin= V'*3
-			printf("ADC VALUE %f\r\r",result);
+//    while (true)
+//    {
+//			float result;   //the type of the data     
+//		  ADC_Start();    //ÆôStart to ADC
+//      while(! NRF_ADC->EVENTS_END){};  
+//			result = (NRF_ADC->RESULT)*1.0;  //ADC= (Vin/3)*1024/1.2
+//			result=result*1.2/1024.0;         //V'= ADC*1.2/1024
+//			result *=3;												//Vin= V'*3
+//			printf("ADC VALUE %f\r\r",result);
+//			nrf_delay_ms(500);
+//			nrf_gpio_pin_toggle(LED_2);
+//    }
+
+//Wedy vibrator power consumption test
+		for(int i=1;i<=100000;i++)
+		{
+			//float tick;
+			//tick++;
+			//tick = tick+1;
+			int s=0;
+			s+=i;
+			printf("%d\r\r", i);
+			nrf_gpio_pin_toggle(Vibrator);
 			nrf_delay_ms(500);
-			nrf_gpio_pin_toggle(LED_2);
-    }
-}
+			//nrf_gpio_pin_write(Vibrator, 1);
+		}
 
-
+	}
 
 
 /** @} */
