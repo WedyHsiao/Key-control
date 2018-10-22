@@ -24,7 +24,9 @@
 .\_build\main.o: ..\..\..\..\..\components\libraries\util\app_util.h
 .\_build\main.o: ..\..\..\..\..\components\libraries\util\app_error_weak.h
 .\_build\main.o: ..\..\..\..\..\components\drivers_nrf\delay\nrf_delay.h
+.\_build\main.o: ..\..\..\..\..\components\drivers_nrf\hal\nrf_gpio.h
+.\_build\main.o: ..\..\..\..\..\components\drivers_nrf\hal\nrf_gpiote.h
+.\_build\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
 .\_build\main.o: ..\..\..\..\bsp\bsp.h
 .\_build\main.o: ..\..\..\..\bsp\boards.h
-.\_build\main.o: ..\..\..\..\..\components\drivers_nrf\hal\nrf_gpio.h
 .\_build\main.o: ..\..\..\..\bsp\pca10028.h
