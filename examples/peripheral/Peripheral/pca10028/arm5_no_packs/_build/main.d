@@ -30,3 +30,11 @@
 .\_build\main.o: ..\..\..\..\bsp\bsp.h
 .\_build\main.o: ..\..\..\..\bsp\boards.h
 .\_build\main.o: ..\..\..\..\bsp\pca10028.h
+.\_build\main.o: ..\..\..\..\..\components\drivers_nrf\timer\nrf_drv_timer.h
+.\_build\main.o: ..\..\config\uart_pca10028\nrf_drv_config.h
+.\_build\main.o: ..\..\..\..\..\components\drivers_nrf\config\nrf_drv_config_validation.h
+.\_build\main.o: ..\..\..\..\..\components\drivers_nrf\hal\nrf_timer.h
+.\_build\main.o: ..\..\..\..\..\components\drivers_nrf\ppi\nrf_drv_ppi.h
+.\_build\main.o: ..\..\..\..\..\components\drivers_nrf\hal\nrf_ppi.h
+.\_build\main.o: ..\..\..\..\..\components\libraries\util\sdk_resources.h
+.\_build\main.o: ..\..\..\..\..\components\drivers_nrf\gpiote\nrf_drv_gpiote.h

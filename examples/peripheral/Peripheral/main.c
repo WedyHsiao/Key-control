@@ -19,17 +19,31 @@
  * This file contains the source code for a sample application using UART.
  * 
  */
+ 
+ /**wedy claim
+ *@brief this development is for the multiple functions with below:
+ *Function_BUTTON
+ *Function_ADC
+ *Function_VIBRATOR
+ *Function_PWM
+ *please use above symbol to define the function
+ *each time re-define must rebuild the program then load
+ */
 
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
-#include "app_uart.h"
-#include "app_error.h"
-#include "nrf_delay.h"
-#include "nrf_gpio.h"
-#include "nrf_gpiote.h"
-#include "nrf.h"
-#include "bsp.h"
+#include "app_uart.h" // serial port display
+#include "app_error.h" //for UART notify
+#include "nrf_delay.h" //time delay
+#include "nrf_gpio.h" //gpio control and setting
+#include "nrf_gpiote.h" //button control
+#include "nrf.h" //identify the software
+#include "bsp.h" //button for functionally module
+/*Below were added for PWM application*/
+#include "nrf_drv_timer.h"  //include for PWM simulation
+#include "nrf_drv_ppi.h"    //improve the response
+#include "nrf_drv_gpiote.h" // turns the GPIO staus
 
 ////////////////////////////////////////////Define///////////////////////////
 /*ADC definitions*/
@@ -45,10 +59,14 @@ const uint8_t leds_list[LEDS_NUMBER]={LED_1,LED_2,LED_3,LED_4}; // the LED in us
 #define UART_TX_BUF_SIZE 256                         /**< UART TX buffer size. */
 #define UART_RX_BUF_SIZE 1                           /**< UART RX buffer size. */
 
+/*PWM definitions*/
+uint32_t Data_To_Timer[]={100000,900000,1000000};
+static void Timer_Init(void);
 ////////////////////////////////////End fo Define///////////////////////////
 
 ////////////////////////////////////////////UART//////////////////
 /*Wedy add UART control*/
+/*baudrate=115200, 8 component(view in the content)*/
 void uart_error_handle(app_uart_evt_t * p_event)
 {
  if (p_event->evt_type == APP_UART_COMMUNICATION_ERROR)
@@ -63,7 +81,8 @@ void uart_error_handle(app_uart_evt_t * p_event)
 ////////////////////////////////////////////UART//////////////////
 
 //////////////////VIBRATOR setting/////////////////////////////////////
-#if Function_Vibrator
+/*vibrating counts*/
+#if Function_VIBRATOR
 static void VIBRATOR_Init(void)    //set the pin control
 {
  //simulate for vibrator power consumption
@@ -73,6 +92,73 @@ static void VIBRATOR_Init(void)    //set the pin control
 }
 //////////////////VIBRATOR setting/////////////////////////////////////
 
+//////////////////PWM content/////////////////////////////////////
+/*Wedy add PWM program trying
+*Step 1. set the GPIO
+*Setp 2. set the timer and value the CC[0](empty)&CC[1](cycle) then start the timer
+*Step 3. enable and set to interrupt the CC[1], setting the priority
+*Step 4. set the module of GPIOTE
+*Step 5. set the PPI module
+*Step 6. Do in the wihil(1)
+********************************/
+#elif Function_PWM
+static void PWM_Init(void) // initial the pin for PWM experiment (GPIO intial)
+{
+	nrf_gpio_cfg_output(LED_3);                            //LED3 for PWM testing
+ nrf_gpio_pin_set(LED_3);
+}
+
+/*There is no PWM module int the nRF5X series
+*thus we use timer to achieve the PWM function*/ 
+static void Timer_Init(void)				//timer intial
+{
+ NRF_TIMER0->MODE = TIMER_MODE_MODE_Timer;               //mode of counting
+ NRF_TIMER0->PRESCALER = 4;                              //4/1MHZ
+ NRF_TIMER0->BITMODE = TIMER_BITMODE_BITMODE_32Bit;      //32bit for counting
+ NRF_TIMER0->CC[0]=100000;                               //CC[0]=100000
+ NRF_TIMER0->CC[1]=1000000;															//CC[1] (cycle) must > CC[0] to simulate a pulse
+	
+ NRF_TIMER0->INTENSET = TIMER_INTENSET_COMPARE1_Msk ;  //compare to inturrupt
+ NVIC_SetPriority(TIMER0_IRQn,3);                      //the priority for inturrupt with timer
+ NVIC_EnableIRQ(TIMER0_IRQn);                          //enable to inturrupt the timer
+ NRF_TIMER0->TASKS_START =1;                           //start the timer
+}
+
+static void PPI_Init(void)                             //PPI module intial
+{
+	//enhance the response time
+ NRF_PPI->CH[0].EEP = (uint32_t)(&NRF_TIMER0->EVENTS_COMPARE[0]);  
+ NRF_PPI->CH[0].TEP = (uint32_t)(&NRF_GPIOTE->TASKS_OUT[0]);
+ NRF_PPI->CH[1].EEP = (uint32_t)(&NRF_TIMER0->EVENTS_COMPARE[1]);
+ NRF_PPI->CH[1].TEP = (uint32_t)(&NRF_GPIOTE->TASKS_OUT[0]);
+ //use channel 0 and channel 1 to control the mode
+ NRF_PPI->CHEN = (PPI_CHEN_CH0_Enabled<<PPI_CHEN_CH0_Pos)|(PPI_CHEN_CH1_Enabled<<PPI_CHEN_CH1_Pos); 
+}
+
+static void GPIOTE_Init(void)                         //GPIOTE intial
+{
+ //TASK to turns the LED3 which means to transver the status H/L
+ NRF_GPIOTE->CONFIG[0]=(GPIOTE_CONFIG_MODE_Task<<GPIOTE_CONFIG_MODE_Pos) |(GPIOTE_CONFIG_OUTINIT_High<<GPIOTE_CONFIG_OUTINIT_Pos)
+ |(GPIOTE_CONFIG_POLARITY_Toggle<<GPIOTE_CONFIG_POLARITY_Pos)|(LED_3<<GPIOTE_CONFIG_PSEL_Pos);
+}
+
+
+void TIMER0_IRQHandler(void)                       //service for interrupt TIMER                      
+{
+ static uint8_t int_counter=0;
+ int_counter++;
+ if(NRF_TIMER0->EVENTS_COMPARE[1] != 0)                   
+ {
+    NRF_TIMER0->EVENTS_COMPARE[1]=0;              //interrupt to clear
+	  NRF_TIMER0->TASKS_CLEAR= 1;                   //clear the timer ->0
+ }
+  if(int_counter==3)
+	{
+	 int_counter=0;
+	}
+  NRF_TIMER0->CC[0]=Data_To_Timer[int_counter];   //CC[0] get the data again
+}
+//////////////////PWM content/////////////////////////////////////
 
 //////////////////ADC content///////////////////////////
 /*Wedy add ADC control*/
@@ -106,7 +192,7 @@ static void ADC_Init(void)     //ADC intial
 
 ////////////////////////////Button content///////////////////////////
 /*Wedy add butoon control*/
-#elif Function_Button
+#elif Function_BUTTON
 static void BUTTON_Init(void)                      //button intial
 {
  uint8_t i;
@@ -176,7 +262,7 @@ int main(void)
           CTS_PIN_NUMBER,
           APP_UART_FLOW_CONTROL_ENABLED,
           false,
-          UART_BAUDRATE_BAUDRATE_Baud115200
+          UART_BAUDRATE_BAUDRATE_Baud115200 //the baudrate is set
       };
 
 		
@@ -206,7 +292,8 @@ int main(void)
 			nrf_delay_ms(500);
 			nrf_gpio_pin_toggle(LED_2);
     }
-#elif Function_Vibrator  //Wedy vibrator power consumption test
+		
+#elif Function_VIBRATOR  //Wedy vibrator power consumption test
 		VIBRATOR_Init();
 		for(int i=1;i<=100000;i++)
 		{
@@ -217,7 +304,19 @@ int main(void)
 			nrf_delay_ms(500);
 			//nrf_gpio_pin_write(Vibrator, 1);
 		}
-#elif Function_Button //Wedy button control to light up the LED
+		
+#elif Function_PWM //Wedy do the PWM test
+NRF_CLOCK ->EVENTS_HFCLKSTARTED = 0;             //start the main timer
+ NRF_CLOCK ->TASKS_HFCLKSTART = 1;
+ while(NRF_CLOCK ->EVENTS_HFCLKSTARTED ==0)
+ {} 
+ PWM_Init();                                     //PWM GPIO intial
+ Timer_Init();                                    //TIMER0 intial
+ GPIOTE_Init();                                   //GPIOTE intial
+ PPI_Init();                                      //PPI intial
+ while(1);
+	 
+#elif Function_BUTTON //Wedy button control to light up the LED
 		BUTTON_Init();
 		while(1);
 #else

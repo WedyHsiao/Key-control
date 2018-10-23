@@ -338,7 +338,7 @@
               <MiscControls></MiscControls>
               <Define>BSP_DEFINES_ONLY BOARD_PCA10028 NRF51</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\config\uart_pca10028;..\..\config;..\..\..\..\..\components\drivers_nrf\common;..\..\..\..\..\components\drivers_nrf\config;..\..\..\..\..\components\drivers_nrf\delay;..\..\..\..\..\components\drivers_nrf\hal;..\..\..\..\..\components\drivers_nrf\nrf_soc_nosd;..\..\..\..\..\components\drivers_nrf\uart;..\..\..\..\..\components\libraries\fifo;..\..\..\..\..\components\libraries\uart;..\..\..\..\..\components\libraries\util;..\..\..\..\..\components\libraries\button;..\..\..\..\..\components\toolchain;..\..\..\..\bsp;..\..</IncludePath>
+              <IncludePath>..\..\config\uart_pca10028;..\..\config;..\..\..\..\..\components\drivers_nrf\common;..\..\..\..\..\components\drivers_nrf\timer;..\..\..\..\..\components\drivers_nrf\gpiote;..\..\..\..\..\components\drivers_nrf\ppi;..\..\..\..\..\components\drivers_nrf\config;..\..\..\..\..\components\drivers_nrf\delay;..\..\..\..\..\components\drivers_nrf\hal;..\..\..\..\..\components\drivers_nrf\nrf_soc_nosd;..\..\..\..\..\components\drivers_nrf\uart;..\..\..\..\..\components\libraries\fifo;..\..\..\..\..\components\libraries\uart;..\..\..\..\..\components\libraries\util;..\..\..\..\..\components\libraries\button;..\..\..\..\..\components\toolchain;..\..\..\..\bsp;..\..</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -425,7 +425,7 @@
                 <v6Rtti>2</v6Rtti>
                 <VariousControls>
                   <MiscControls></MiscControls>
-                  <Define>Function_Vibrator</Define>
+                  <Define>Function_PWM</Define>
                   <Undefine></Undefine>
                   <IncludePath></IncludePath>
                 </VariousControls>
