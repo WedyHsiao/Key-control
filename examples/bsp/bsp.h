@@ -32,13 +32,13 @@
 #include <stdbool.h>
 #include "boards.h"
 
-#if !defined(BSP_DEFINES_ONLY) && !defined(BSP_SIMPLE)
+//#if !defined(BSP_DEFINES_ONLY) && !defined(BSP_SIMPLE)
 #include "app_button.h"
 
 #define BSP_BUTTON_ACTION_PUSH      (APP_BUTTON_PUSH)    /**< Represents pushing a button. See @ref bsp_button_action_t. */
 #define BSP_BUTTON_ACTION_RELEASE   (APP_BUTTON_RELEASE) /**< Represents releasing a button. See @ref bsp_button_action_t. */
-#define BSP_BUTTON_ACTION_LONG_PUSH (2)                  /**< Represents pushing and holding a button for @ref BSP_LONG_PUSH_TIMEOUT_MS milliseconds. See also @ref bsp_button_action_t. */
-#endif
+#define BSP_BUTTON_ACTION_LONG_PUSH (3)                  /**< Represents pushing and holding a button for @ref BSP_LONG_PUSH_TIMEOUT_MS milliseconds. See also @ref bsp_button_action_t. */
+//#endif
 
 /* BSP_UART_SUPPORT
  * This define enables UART support module.

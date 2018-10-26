@@ -21,17 +21,7 @@
  */
  
  /**wedy claim
-<<<<<<< HEAD
  *@brief this development is for the event function by control button
-=======
- *@brief this development is for the multiple functions with below:
- *Function_BUTTON
- *Function_ADC
- *Function_VIBRATOR
- *Function_PWM
- *please use above symbol to define the function
- *each time re-define must rebuild the program then load
->>>>>>> parent of 9526a76... The Function_EVENT has been added.
  */
 
 #include <stdbool.h>
@@ -41,13 +31,12 @@
 #include "app_error.h" //for UART notify
 #include "nrf_delay.h" //time delay
 #include "nrf_gpio.h" //gpio control and setting
-#include "nrf_gpiote.h" //button control
 #include "nrf.h" //identify the software
 #include "bsp.h" //button for functionally module
-/*Below were added for PWM application*/
-#include "nrf_drv_timer.h"  //include for PWM simulation
-#include "nrf_drv_ppi.h"    //improve the response
-#include "nrf_drv_gpiote.h" // turns the GPIO staus
+#include "app_timer.h" //add for the event control
+#include "nrf_drv_gpiote.h" //gpiote control
+#include "nrf_drv_clock.h" //add for the FCLK for event
+#include "app_button.h" //event control 
 
 ////////////////////////////////////////////Define///////////////////////////
 /*ADC definitions*/
@@ -65,7 +54,6 @@ const uint8_t leds_list[LEDS_NUMBER]={LED_1,LED_2,LED_3,LED_4}; // the LED in us
 
 /*PWM definitions*/
 uint32_t Data_To_Timer[]={100000,900000,1000000};
-<<<<<<< HEAD
 
 /*Eevent definition*/
 #define APP_TIMER_PRESCALER 0 /**< Value of the RTC1 PRESCALER register. */
@@ -74,9 +62,6 @@ uint32_t Data_To_Timer[]={100000,900000,1000000};
 
 
 
-=======
-static void Timer_Init(void);
->>>>>>> parent of 9526a76... The Function_EVENT has been added.
 ////////////////////////////////////End fo Define///////////////////////////
 
  
@@ -190,7 +175,7 @@ static void Timer_Init(void)				//timer intial
  NRF_TIMER0->TASKS_START =1;                           //start the timer
 }
 
-static void PPI_Init(void)                             //PPI module intial
+static void PPI_Init(void)                             //PPI module intial (Programmable Peripheral Interconnect)
 {
 	//enhance the response time
  NRF_PPI->CH[0].EEP = (uint32_t)(&NRF_TIMER0->EVENTS_COMPARE[0]);  
@@ -204,8 +189,10 @@ static void PPI_Init(void)                             //PPI module intial
 static void GPIOTE_Init(void)                         //GPIOTE intial
 {
  //TASK to turns the LED3 which means to transver the status H/L
- NRF_GPIOTE->CONFIG[0]=(GPIOTE_CONFIG_MODE_Task<<GPIOTE_CONFIG_MODE_Pos) |(GPIOTE_CONFIG_OUTINIT_High<<GPIOTE_CONFIG_OUTINIT_Pos)
- |(GPIOTE_CONFIG_POLARITY_Toggle<<GPIOTE_CONFIG_POLARITY_Pos)|(LED_3<<GPIOTE_CONFIG_PSEL_Pos);
+ NRF_GPIOTE->CONFIG[0]=(GPIOTE_CONFIG_MODE_Task<<GPIOTE_CONFIG_MODE_Pos) |
+ (GPIOTE_CONFIG_OUTINIT_High<<GPIOTE_CONFIG_OUTINIT_Pos)|
+	(GPIOTE_CONFIG_POLARITY_Toggle<<GPIOTE_CONFIG_POLARITY_Pos)|
+	(LED_3<<GPIOTE_CONFIG_PSEL_Pos);
 }
 
 
@@ -240,7 +227,7 @@ static void PWM_task(void)
 
 //////////////////ADC content///////////////////////////
 /*Wedy add ADC control*/
-static void ADC_Start(void)    //ÆôADC control
+static void ADC_Start(void)    //?ADC control
 {
  NRF_ADC->ENABLE =1;						
  NRF_ADC->TASKS_START = 1;     // enable
@@ -259,7 +246,7 @@ static void ADC_task(void)
     for(int i=1;i<=10;i++)
 		{
 			float result;   //the type of the data     
-		  ADC_Start();    //ÆôStart to ADC
+		  ADC_Start();    //?Start to ADC
       while(! NRF_ADC->EVENTS_END){};  
 			result = (NRF_ADC->RESULT)*1.0;  //ADC= (Vin/3)*1024/1.2
 			result=result*1.2/1024.0;         //V'= ADC*1.2/1024
@@ -273,7 +260,6 @@ static void ADC_task(void)
 
 //////////////////ADC content///////////////////////////
 
-<<<<<<< HEAD
 
 ////////////////////////////EVENT event control content///////////////////////////
 /**@brief Function for handling events from the BSP module.
@@ -363,112 +349,6 @@ int main(void)
 		for(;;)
 		{
 		}
-=======
-void GPIOTE_IRQHandler(void)                       //GPIOTE interrupt service                     
-{
- if(NRF_GPIOTE->EVENTS_PORT !=0)                   
- {
-    NRF_GPIOTE->EVENTS_PORT=0;                     //clear
-	  for(uint8_t i=0;i<BUTTONS_NUMBER;i++)          //read the button situation
-	  {
-		 if(nrf_gpio_pin_read(buttons_list[i])==0)
-		 {
-		  nrf_delay_ms(10);                            //set the time to read
-		  if(nrf_gpio_pin_read(buttons_list[i])==0)
-		  {
-			 nrf_gpio_pin_toggle(leds_list[i]);          // turns the LED
-			}
-		 }
-		}
- }
-}
-#else
-#error " please idenfify a function!"
-#endif
-////////////////////////////Button content///////////////////////////
-
-
-/*******
-*******
-******
-*****
-***
-**
- * @brief Function for main application entry.
- */
-int main(void)                 
-{
-/*UART content */	
-	uint32_t err_code;
-    const app_uart_comm_params_t comm_params =
-      {
-          RX_PIN_NUMBER,
-          TX_PIN_NUMBER,
-          RTS_PIN_NUMBER,
-          CTS_PIN_NUMBER,
-          APP_UART_FLOW_CONTROL_ENABLED,
-          false,
-          UART_BAUDRATE_BAUDRATE_Baud115200 //the baudrate is set
-      };
-
-		
-    APP_UART_FIFO_INIT(&comm_params,
-                         UART_RX_BUF_SIZE,
-                         UART_TX_BUF_SIZE,
-                         uart_error_handle,
-                         APP_IRQ_PRIORITY_LOW,
-                         err_code);
-
-    APP_ERROR_CHECK(err_code);
-/*UART content End*/			
-
-#if Function_ADC		//Wedy ADC from GPIO pin_1			
-		ADC_Init(); 	
-		LEDS_CONFIGURE(LEDS_MASK);
-    LEDS_OFF(LEDS_MASK);
-    while (true)
-    {
-			float result;   //the type of the data     
-		  ADC_Start();    //ÆôStart to ADC
-      while(! NRF_ADC->EVENTS_END){};  
-			result = (NRF_ADC->RESULT)*1.0;  //ADC= (Vin/3)*1024/1.2
-			result=result*1.2/1024.0;         //V'= ADC*1.2/1024
-			result *=3;												//Vin= V'*3
-			printf("ADC VALUE %f\r\r",result);
-			nrf_delay_ms(500);
-			nrf_gpio_pin_toggle(LED_2);
-    }
-		
-#elif Function_VIBRATOR  //Wedy vibrator power consumption test
-		VIBRATOR_Init();
-		for(int i=1;i<=100000;i++)
-		{
-			int tick=0;
-			tick+=i;
-			printf("%d\r\r", i);
-			nrf_gpio_pin_toggle(Vibrator);
-			nrf_delay_ms(500);
-			//nrf_gpio_pin_write(Vibrator, 1);
-		}
-		
-#elif Function_PWM //Wedy do the PWM test
-NRF_CLOCK ->EVENTS_HFCLKSTARTED = 0;             //start the main timer
- NRF_CLOCK ->TASKS_HFCLKSTART = 1;
- while(NRF_CLOCK ->EVENTS_HFCLKSTARTED ==0)
- {} 
- PWM_Init();                                     //PWM GPIO intial
- Timer_Init();                                    //TIMER0 intial
- GPIOTE_Init();                                   //GPIOTE intial
- PPI_Init();                                      //PPI intial
- while(1);
-	 
-#elif Function_BUTTON //Wedy button control to light up the LED
-		BUTTON_Init();
-		while(1);
-#else
-#error	"Function is not defined, please define the preprocessor symbol in the file! "	
-#endif
->>>>>>> parent of 9526a76... The Function_EVENT has been added.
 	}
 
 
