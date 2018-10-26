@@ -23,7 +23,6 @@
 #define SENSE_FIELD_POS           (6)
 #define SENSE_FIELD_MASK          (0xC0)
 
-
 /**
  * @brief Macro for conveting task-event index to an address of an event register.
  *

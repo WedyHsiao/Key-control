@@ -27,9 +27,13 @@
 #define PERIPHERAL_RESOURCE_SHARING_ENABLED  0
 
 /* CLOCK */
+<<<<<<< HEAD
 
 #define CLOCK_ENABLED 1
 
+=======
+#define CLOCK_ENABLED 0
+>>>>>>> parent of 9526a76... The Function_EVENT has been added.
 
 #if (CLOCK_ENABLED == 1)
 #define CLOCK_CONFIG_XTAL_FREQ          NRF_CLOCK_XTALFREQ_Default
@@ -37,14 +41,19 @@
 #define CLOCK_CONFIG_IRQ_PRIORITY       APP_IRQ_PRIORITY_LOW
 #endif
 
+<<<<<<< HEAD
 
 #define GPIOTE_ENABLED 1
 
+=======
+/* GPIOTE */
+#define GPIOTE_ENABLED 0
+>>>>>>> parent of 9526a76... The Function_EVENT has been added.
 
 #if (GPIOTE_ENABLED == 1)
 #define GPIOTE_CONFIG_USE_SWI_EGU false
 #define GPIOTE_CONFIG_IRQ_PRIORITY APP_IRQ_PRIORITY_LOW
-#define GPIOTE_CONFIG_NUM_OF_LOW_POWER_EVENTS 4
+#define GPIOTE_CONFIG_NUM_OF_LOW_POWER_EVENTS 1
 #endif
 
 /* TIMER */
