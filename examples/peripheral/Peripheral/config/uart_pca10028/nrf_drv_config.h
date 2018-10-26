@@ -27,7 +27,11 @@
 #define PERIPHERAL_RESOURCE_SHARING_ENABLED  0
 
 /* CLOCK */
+#if Function_EVENT
+#define CLOCK_ENABLED 1
+#else
 #define CLOCK_ENABLED 0
+#endif
 
 #if (CLOCK_ENABLED == 1)
 #define CLOCK_CONFIG_XTAL_FREQ          NRF_CLOCK_XTALFREQ_Default
@@ -36,12 +40,16 @@
 #endif
 
 /* GPIOTE */
+#if Function_EVENT
+#define GPIOTE_ENABLED 1
+#else
 #define GPIOTE_ENABLED 0
+#endif
 
 #if (GPIOTE_ENABLED == 1)
 #define GPIOTE_CONFIG_USE_SWI_EGU false
 #define GPIOTE_CONFIG_IRQ_PRIORITY APP_IRQ_PRIORITY_LOW
-#define GPIOTE_CONFIG_NUM_OF_LOW_POWER_EVENTS 1
+#define GPIOTE_CONFIG_NUM_OF_LOW_POWER_EVENTS 4
 #endif
 
 /* TIMER */
